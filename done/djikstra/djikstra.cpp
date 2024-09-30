@@ -4,11 +4,12 @@
 #include <climits>
 #include <queue>
 #include <fstream>
+#include <limits>
 
 using namespace std;
 
 
-vector<int> djikstra(Grafo & grafo, int vn, vector<int> & dist){
+vector<double> djikstra(Grafo & grafo, int vn, vector<double> & dist){
     priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
     
     queue<int> visited;
@@ -57,7 +58,7 @@ int main(int argc, char const *argv[])
 
     Grafo adj(n);
     
-    vector<int> dist(n+1, INT_MAX);
+    vector<double> dist(n+1, std::numeric_limits<double>::max());
     
     int u, v, peso;
     while (arquivo >> u >> v >> peso) {
@@ -69,8 +70,8 @@ int main(int argc, char const *argv[])
     djikstra(adj, origem, dist);
 
     std::cout << "Distâncias a partir do vértice " << origem << ":" << std::endl;
-    for (int i = 1; i <= n; ++i) {
-        if (dist[i] == INT_MAX) {
+    for (int i = 0; i <= n; ++i) {
+        if (dist[i] == std::numeric_limits<double>::max()) {
             std::cout << "Vértice " << i << ": "<< -1 << std::endl;
         } else {
             std::cout << "Vértice " << i << ": " << dist[i] << std::endl;

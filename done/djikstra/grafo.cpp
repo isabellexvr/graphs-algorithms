@@ -8,7 +8,7 @@ void Grafo::add_edge(int u, int v, double peso){
 }
 
 void Grafo::print_graph() const {
-    for (int i = 1; i <= n; ++i) {
+    for (int i = 0; i <= n; ++i) {
         std::cout << i << ": ";
         for (const auto& [vizinho, peso] : adj[i]) {
             std::cout << "(" << vizinho << ", " << peso << ") ";
