@@ -2,9 +2,11 @@
 #include <vector>
 #include <stack>
 #include <fstream>
+#include <algorithm>
 using namespace std;
 
-class Graph {
+class Graph
+{
 private:
     int numVertices;             // Número de vértices no grafo
     vector<vector<int>> adjList; // Lista de adjacências (vetor de vetores)
@@ -17,8 +19,23 @@ public:
         adjList.resize(vertices); // Redimensiona a lista de adjacências
     }
 
-    int getNumVertices() {
+    int getNumVertices()
+    {
         return numVertices;
+    }
+
+    // Método para imprimir o grafo (lista de adjacências)
+    void printGraph()
+    {
+        for (int i = 0; i < numVertices; i++)
+        {
+            cout << "Vértice " << i + 1 << ":";
+            for (int j : adjList[i])
+            {
+                cout << " -> " << j + 1;
+            }
+            cout << endl;
+        }
     }
 
     // Função para adicionar uma aresta ao grafo direcionado (somente src -> dest)
@@ -27,20 +44,29 @@ public:
         adjList[src].push_back(dest); // Adiciona a aresta de origem para destino
     }
 
-    // Função para realizar a busca em profundidade (DFS) e empilhar os vértices na ordem de término
-    void dfsOriginalGraph(int vertex, vector<bool>& visitedVertices, stack<int>& firstDFSVisits)
+    // Método para imprimir o vetor de vértices visitados
+    void printVisited(const vector<bool> &visitedVertices)
     {
-        visitedVertices[vertex] = true;     // Marca o vértice atual como visitado
+        for (int i = 0; i < visitedVertices.size(); i++)
+        {
+            cout << "Vértice " << i + 1 << ": " << (visitedVertices[i] ? "Visitado" : "Não Visitado") << endl;
+        }
+    }
+
+    // Função para realizar a busca em profundidade (DFS) e empilhar os vértices na ordem de término
+    void dfsOriginalGraph(int vertex, vector<bool> &visitedVertices, stack<int> &firstDFSVisits)
+    {
+        visitedVertices[vertex] = true; // Marca o vértice atual como visitado
 
         for (int adj : adjList[vertex])
-        {                                   // Para cada vértice adjacente
+        { // Para cada vértice adjacente
             if (!visitedVertices[adj])
-            {                               // Se ainda não foi visitado
+            {                                                           // Se ainda não foi visitado
                 dfsOriginalGraph(adj, visitedVertices, firstDFSVisits); // Faz uma chamada recursiva
             }
         }
 
-        firstDFSVisits.push(vertex);        // Empilha o vértice ao final da DFS
+        firstDFSVisits.push(vertex); // Empilha o vértice ao final da DFS
     }
 
     // Função para inverter o grafo
@@ -60,43 +86,34 @@ public:
     }
 
     // Função para realizar a DFS e imprimir os vértices de uma SCC
-    void dfsOnReversedGraph(int vertex, vector<bool>& visitedVertices)
+    void dfsOnReversedGraph(int vertex, vector<bool> &visitedVertices, vector<int> &scc)
     {
-        visitedVertices[vertex] = true;     // Marca o vértice atual como visitado
-        cout << vertex + 1 << " ";              // Imprime o vértice atual (pertencente à SCC)
+        // cout << "vertex: " << vertex << endl;
+        visitedVertices[vertex] = true; // Marca o vértice atual como visitado
+        scc.push_back(vertex + 1);      // Adiciona o vértice ao componente atual
 
+        //cout << "a: " << vertex << endl;
+        //cout << "adjList size: " << adjList.size() << endl;
         for (int adj : adjList[vertex])
         {
+            //cout << "b: " << adj << endl;
             if (!visitedVertices[adj])
             {
-                dfsOnReversedGraph(adj, visitedVertices); // Continua a DFS no grafo invertido
+                // cout << "debug\n";
+                dfsOnReversedGraph(adj, visitedVertices, scc); // Continua a DFS no grafo invertido
             }
-        }
-    }
-
-    // Função para exibir a lista de adjacências do grafo
-    void printGraph()
-    {
-        for (int i = 0; i < numVertices; i++)
-        {
-            cout << "Vértice " << i + 1 << ":";
-            for (int j : adjList[i])
-            {
-                cout << " -> " << j + 1;
-            }
-            cout << endl;
         }
     }
 
     // Função para gerar um novo vetor de visitados
     vector<bool> createVisitedVector()
     {
-        return vector<bool>(numVertices, false); // Retorna um novo vetor de visitados
+        return vector<bool>(numVertices + 1, false); // Retorna um novo vetor de visitados
     }
 };
 
 // Função que implementa o algoritmo de Kosaraju
-int kosaraju(Graph& graph)
+int kosaraju(Graph &graph)
 {
     stack<int> firstDFSVisits;
     vector<bool> visited = graph.createVisitedVector(); // Vetor de visitados para a primeira DFS
@@ -121,25 +138,39 @@ int kosaraju(Graph& graph)
     while (!firstDFSVisits.empty())
     {
         int v = firstDFSVisits.top();
+        //cout << "is v visited: " << visited[v] << endl;
         firstDFSVisits.pop();
+        //cout << "popped: " << v << endl;
 
         // Se o vértice ainda não foi visitado no grafo invertido, processa a SCC
         if (!visited[v])
         {
-            reversedGraph.dfsOnReversedGraph(v, visited); // Segunda DFS no grafo invertido
+            vector<int> scc;                                   // Armazena os vértices do componente fortemente conectado
+            reversedGraph.dfsOnReversedGraph(v, visited, scc); // Segunda DFS no grafo invertido
+
+            // Ordena o componente para garantir a saída correta
+            sort(scc.begin(), scc.end());
+
+            // Imprime o componente fortemente conectado
+            for (int vertex : scc)
+            {
+                cout << vertex << " ";
+            }
             cout << endl;
+
             components++;
         }
     }
 
-    return components; // Retorna o número de componentes fortemente conectadas 
+    return components; // Retorna o número de componentes fortemente conectadas
 }
 
 int main()
 {
     ifstream file("entrada.dat");
 
-    if (!file) {
+    if (!file)
+    {
         std::cerr << "An error occurred on trying to open the file." << std::endl;
         return 1;
     }
@@ -149,12 +180,14 @@ int main()
 
     Graph g(n);
 
-    for (int i = 0; i < m; i++){
+    for (int i = 0; i < m; i++)
+    {
         int u, v;
         file >> u >> v;
         g.addEdge(u - 1, v - 1);
     }
 
+    //g.printGraph();
     kosaraju(g);
 
     return 0;
