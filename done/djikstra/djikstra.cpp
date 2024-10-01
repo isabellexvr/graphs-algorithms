@@ -89,3 +89,10 @@ int main(int argc, char const *argv[])
 
     return 0;
 }
+
+
+    /* for (int i = 0; i < m; i++) {
+        int u, v;
+        arquivo >> u >> v;
+        g.addEdge(u, v);
+    } */
