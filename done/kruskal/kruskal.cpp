@@ -5,6 +5,7 @@
 #include <queue>
 #include <fstream>
 #include <limits>
+#include <cstring>
 
 using namespace std;
 
@@ -47,35 +48,38 @@ public:
     }
 };
 
-int main(int argc, char const *argv[])
-{
-    ifstream arquivo("entrada.dat");
 
-    if (!arquivo) {
-        std::cerr << "Erro ao abrir o arquivo." << std::endl;
-        return 1;
-    }
+void help(){
+    cout << "-h : mostra o help" << endl;
+    cout << "-o <arquivo> : redireciona a saida para o ‘‘arquivo’’" << endl;
+    cout << "-f <arquivo> : indica o ‘‘arquivo’’ que contém o grafo de entrada" << endl;
+    cout << "-s : mostra a solução" << endl;
+    cout << "-i : vértice inicial";
+}
+
+
+void readInputFile(const string &inputFileName, const string &outputFileName, bool s){
+
+    ifstream inputFile(inputFileName);
+    ofstream outputFile(outputFileName);
 
     int n, m;
-    arquivo >> n >> m;
+    inputFile >> n >> m;
 
     Grafo adj(n);
 
     int u, v, peso;
-    while (arquivo >> u >> v >> peso) {
+    while (inputFile >> u >> v >> peso) {
         adj.add_edge(u, v, peso);
     }
 
     adj.ordernarArestas();
 
-    const auto& edges1 = adj.get_edges(); // Obtém as arestas do grafo
-    for (const auto& edge : edges1) {
-        std::cout << edge.u << " " << edge.v << ", Peso: " << edge.peso << std::endl;
-    }
-
     auto edges = adj.get_edges(); 
     Grafo mst(n);
     UnionFind uf(n);
+
+    int custo_total = 0;
 
     // Adiciona arestas ao MST
     for (size_t i = 0; i < edges.size(); ++i) {
@@ -85,17 +89,65 @@ int main(int argc, char const *argv[])
         if (uf.find(edge.u) != uf.find(edge.v)) {
             mst.add_edge(edge.u, edge.v, edge.peso); // Adiciona a aresta ao MST
             uf.union_sets(edge.u, edge.v); // Une os conjuntos
+            custo_total += edge.peso;
         }
         // Caso contrário, a aresta é ignorada (não é adicionada ao MST)
     }
 
-    //cout << "\nArestas do MST:" << endl;
-    for (const auto& edge : mst.get_edges()) {
-        std::cout << "(" << edge.u << "," << edge.v << ") ";
+    if(s){
+        for (const auto& edge : mst.get_edges()) {
+            outputFile << "(" << edge.u << "," << edge.v << ") ";
+            std::cout << "(" << edge.u << "," << edge.v << ") ";
+        }
+        cout<<endl;
+    }else{
+        outputFile<<custo_total;
+        cout<<custo_total<<endl;        
     }
 
-    cout<<endl;
 
-    arquivo.close();
+    inputFile.close();
+    outputFile.close();
+}
+
+
+int main(int argc, char const *argv[])
+{
+
+    string outputFileName, inputFileName;
+    int initialVertex = 1, showSolution = false; // vértice inicial vindo do user pelo "-i"
+
+    for (int i = 1; i < argc; i++){
+
+        if(strcmp(argv[i], "-h") == 0){
+            help();
+
+        }else if(strcmp(argv[i], "-o") == 0){
+            outputFileName = argv[i + 1];
+
+        }else if(strcmp(argv[i], "-f") == 0){
+            inputFileName = argv[i + 1];
+
+        } else if(strcmp(argv[i], "-i")==0){
+            initialVertex = stoi(argv[i+1]);
+            cout << initialVertex << endl;
+        }else if(strcmp(argv[i], "-s")==0){
+            showSolution = true;
+        }
+    }
+
+    if(outputFileName.empty()){
+        outputFileName = "output.bin";
+    }
+
+
+    if(inputFileName.empty()){
+        std::cerr << "No input file was specified." << std::endl;
+        return 1;
+    }else{ 
+        readInputFile(inputFileName, outputFileName, showSolution);
+    }
+
+
     return 0;
 }
