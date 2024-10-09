@@ -3,6 +3,8 @@
 #include <stack>
 #include <fstream>
 #include <algorithm>
+#include <cstring>
+
 using namespace std;
 
 class Graph
@@ -92,11 +94,11 @@ public:
         visitedVertices[vertex] = true; // Marca o vértice atual como visitado
         scc.push_back(vertex + 1);      // Adiciona o vértice ao componente atual
 
-        //cout << "a: " << vertex << endl;
-        //cout << "adjList size: " << adjList.size() << endl;
+        // cout << "a: " << vertex << endl;
+        // cout << "adjList size: " << adjList.size() << endl;
         for (int adj : adjList[vertex])
         {
-            //cout << "b: " << adj << endl;
+            // cout << "b: " << adj << endl;
             if (!visitedVertices[adj])
             {
                 // cout << "debug\n";
@@ -113,12 +115,18 @@ public:
 };
 
 // Função que implementa o algoritmo de Kosaraju
-int kosaraju(Graph &graph)
+int kosaraju(Graph &graph, const std::string &filename)
 {
-    stack<int> firstDFSVisits;
-    vector<bool> visited = graph.createVisitedVector(); // Vetor de visitados para a primeira DFS
+    std::ofstream outFile(filename);
 
-    // Primeira DFS para empilhar vértices de acordo com a ordem de término
+    if (!outFile.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return -1; 
+    }
+
+    stack<int> firstDFSVisits;
+    vector<bool> visited = graph.createVisitedVector(); 
+
     for (int i = 0; i < graph.getNumVertices(); i++)
     {
         if (!visited[i])
@@ -127,68 +135,97 @@ int kosaraju(Graph &graph)
         }
     }
 
-    // Inverte o grafo
+    // Reverse the graph
     Graph reversedGraph = graph.reverseGraph();
 
-    // Reseta o vetor de visitados para a segunda DFS
+    // Reset the visited vector for the second DFS
     visited = reversedGraph.createVisitedVector();
     int components = 0;
 
-    // Processa os vértices na ordem do topo da pilha
+    // Process vertices in order from the stack
     while (!firstDFSVisits.empty())
     {
         int v = firstDFSVisits.top();
-        //cout << "is v visited: " << visited[v] << endl;
         firstDFSVisits.pop();
-        //cout << "popped: " << v << endl;
 
-        // Se o vértice ainda não foi visitado no grafo invertido, processa a SCC
+        // If the vertex is not visited in the reversed graph, process the SCC
         if (!visited[v])
         {
-            vector<int> scc;                                   // Armazena os vértices do componente fortemente conectado
-            reversedGraph.dfsOnReversedGraph(v, visited, scc); // Segunda DFS no grafo invertido
+            vector<int> scc;                                   // Store vertices of the strongly connected component
+            reversedGraph.dfsOnReversedGraph(v, visited, scc); // Second DFS on the reversed graph
 
-            // Ordena o componente para garantir a saída correta
+            // Sort the component to ensure correct output order
             sort(scc.begin(), scc.end());
 
-            // Imprime o componente fortemente conectado
+            // Write the strongly connected component to the file
             for (int vertex : scc)
             {
                 cout << vertex << " ";
+                outFile << vertex << " ";
             }
             cout << endl;
+            outFile << endl;
 
             components++;
         }
     }
 
-    return components; // Retorna o número de componentes fortemente conectadas
+    outFile.close(); // Close the file after writing
+    return components; // Return the number of strongly connected components
 }
 
-int main()
-{
-    ifstream file("entrada.dat");
+void help(){
+    cout << "-h : mostra o help" << endl;
+    cout << "-o <arquivo> : redireciona a saida para o ‘‘arquivo’’" << endl;
+    cout << "-f <arquivo> : indica o ‘‘arquivo’’ que contém o grafo de entrada" << endl;
+}
 
-    if (!file)
-    {
-        std::cerr << "An error occurred on trying to open the file." << std::endl;
-        return 1;
-    }
+void readInputFile(const string &filename, const string &outputFileName){
+    ifstream file(filename);
+    int n,m;
 
-    int n, m;
     file >> n >> m;
-
     Graph g(n);
 
-    for (int i = 0; i < m; i++)
-    {
-        int u, v;
+    for (int i = 0; i < m; i++){
+        int u,v;
         file >> u >> v;
         g.addEdge(u - 1, v - 1);
     }
 
-    //g.printGraph();
-    kosaraju(g);
+    kosaraju(g, outputFileName);
+
+}
+
+int main(int argc, char const *argv[]){
+
+    string outputFileName, inputFileName;
+
+    for (int i = 1; i < argc; i++){
+
+        if(strcmp(argv[i], "-h") == 0){
+            help();
+
+        }else if(strcmp(argv[i], "-o") == 0){
+            outputFileName = argv[i + 1];
+
+        }else if(strcmp(argv[i], "-f") == 0){
+            inputFileName = argv[i + 1];
+
+        }
+    }
+
+    if(outputFileName.empty()){
+        outputFileName = "output.bin";
+    }
+
+    if(inputFileName.empty()){
+        std::cerr << "No input file was specified." << std::endl;
+        return 1;
+    }else{
+        readInputFile(inputFileName, outputFileName);
+    }
+
 
     return 0;
 }
