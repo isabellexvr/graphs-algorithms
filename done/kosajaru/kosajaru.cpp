@@ -114,8 +114,8 @@ public:
     }
 };
 
-// Função que implementa o algoritmo de Kosaraju
-int kosaraju(Graph &graph, const std::string &filename)
+// Função que implementa o algoritmo de kosajaru
+int kosajaru(Graph &graph, const std::string &filename)
 {
     std::ofstream outFile(filename);
 
@@ -193,7 +193,7 @@ void readInputFile(const string &filename, const string &outputFileName){
         g.addEdge(u - 1, v - 1);
     }
 
-    kosaraju(g, outputFileName);
+    kosajaru(g, outputFileName);
 
 }
 
