@@ -1,80 +1,80 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <climits> // Para INT_MAX
+#include <climits>
+#include <cstring>
+#include <fstream>
+
 using namespace std;
 
-// Define uma aresta como um par de (vértice, peso)
 typedef pair<int, int> Edge;
 
 class Graph {
 private:
-    int n; // Número de vértices
-    vector<vector<Edge>> adjList; // Lista de adjacência
+    int n;
+    vector<vector<Edge>> adjList;
 
 public:
-    // Construtor
+
     Graph(int n) {
         this->n = n;
         adjList.resize(n); // Inicializa a lista de adjacência com 'n' vértices
     }
 
-    // Função para adicionar uma aresta ao grafo
     void addEdge(int u, int v, int weight) {
-        adjList[u].push_back({v, weight}); // Aresta de u para v
-        adjList[v].push_back({u, weight}); // Aresta de v para u (grafo não-direcionado)
+        adjList[u].push_back({v, weight});
+        adjList[v].push_back({u, weight});
     }
 
-    // Função que implementa o algoritmo de Prim
-    void primMST(int start) {
-        // Vetor de custos: inicializado com valores infinitos
+    void primMST(int start, bool solution) {
         vector<int> custo(n, INT_MAX);
-        // Vetor de predecessores
         vector<int> prev(n, -1);
-        // Vetor para marcar os vértices já incluídos na árvore geradora mínima
         vector<bool> inMST(n, false);
 
-        // Fila de prioridade mínima: armazena pares (custo, vértice)
         priority_queue<Edge, vector<Edge>, greater<Edge>> pq;
 
-        // Começamos pelo vértice inicial, com custo 0
         pq.push({0, start});
         custo[start] = 0;
 
         while (!pq.empty()) {
-            // Extraímos o vértice com o menor custo
             int v = pq.top().second;
             pq.pop();
 
-            // Se o vértice já está na árvore, ignoramos
             if (inMST[v]) continue;
 
-            // Marcamos o vértice como incluído na árvore
             inMST[v] = true;
 
-            // Percorremos todos os vizinhos de 'v'
             for (auto &edge : adjList[v]) {
-                int u = edge.first;  // Vértice adjacente
-                int peso = edge.second;  // Peso da aresta v-u
+                int u = edge.first; 
+                int peso = edge.second;
 
-                // Se 'u' ainda não está na árvore e o peso é menor que o custo atual
                 if (!inMST[u] && custo[u] > peso) {
-                    // Atualizamos o custo e o predecessor de 'u'
                     custo[u] = peso;
                     prev[u] = v;
-                    // Inserimos o novo custo na fila de prioridade
+
                     pq.push({custo[u], u});
                 }
             }
         }
 
-        // Exibir o resultado da árvore geradora mínima
-        cout << "Arestas da Árvore Geradora Mínima:\n";
-        for (int i = 0; i < n; ++i) {
-            if (prev[i] != -1) {
-                cout << prev[i] << " - " << i << "  com peso: " << custo[i] << endl;
+        if (solution) {
+            for (int i = 0; i < n; ++i) {
+                if (prev[i] != -1) {
+                    cout << "(" << prev[i] + 1 << "," << i + 1 << ") ";
+                }
             }
+            cout << endl;
+        } else {
+            int totalWeight = 0;
+            for (int i = 0; i < n; ++i) {
+                if (prev[i] != -1) {
+                    totalWeight += custo[i];
+                }
+            }
+            cout << totalWeight << endl;
         }
+
+
     }
 
     void printGraph() {
@@ -89,27 +89,65 @@ public:
     }
 };
 
-int main() {
-    int n = 7;
+void help(){
+    cout << "-h : mostra o help" << endl;
+    cout << "-o <arquivo> : redireciona a saida para o ‘‘arquivo’’" << endl;
+    cout << "-f <arquivo> : indica o ‘‘arquivo’’ que contém o grafo de entrada" << endl;
+    cout << "-s : mostra a solução" << endl;
+    cout << "-i : vértice inicial (para o algoritmo de Prim)" << endl;
+}
 
+void readInputFile(const string &filename, const string &outputFileName, int start, bool solution){
+    ifstream file(filename);
+    int n,m;
+
+    file >> n >> m;
     Graph g(n);
 
-    g.addEdge(0,1,2);
-    g.addEdge(0,4,4);
-    g.addEdge(0,5,5);
-    g.addEdge(1,4,1);
-    g.addEdge(1,3,3);
-    g.addEdge(1,2,7);
-    g.addEdge(1,6,4);
-    g.addEdge(1,5,8);
-    g.addEdge(3,2,10);
-    g.addEdge(3,4,2);
-    g.addEdge(2,6,6);
-    g.addEdge(6,5,1);
+    for (int i = 0; i < m; i++){
+        int u, v, w;
+        file >> u >> v >> w;
+        g.addEdge(u - 1, v - 1, w);
+    }
 
-    g.printGraph();
+    g.primMST(start, solution);
 
-    g.primMST(0);
+}
+
+int main(int argc, char const *argv[]) {
+    string outputFileName, inputFileName;
+    int solution = 0, start = 0;
+
+    for (int i = 1; i < argc; i++){
+
+        if(strcmp(argv[i], "-h") == 0){
+            help();
+
+        }else if(strcmp(argv[i], "-o") == 0){
+            outputFileName = argv[i + 1];
+
+        }else if(strcmp(argv[i], "-f") == 0){
+            inputFileName = argv[i + 1];
+
+        } else if(strcmp(argv[i], "-s") == 0){
+            solution = 1  ;
+
+        } else if(strcmp(argv[i], "-i") == 0){
+           start = atoi(argv[i + 1]);
+
+        }
+    }
+
+    if(outputFileName.empty()){
+        outputFileName = "output.bin";
+    }
+    
+    if(inputFileName.empty()){
+        std::cerr << "No input file was specified." << std::endl;
+        return 1;
+    }
+
+    readInputFile(inputFileName, outputFileName, start, solution);
 
     return 0;
 }
