@@ -1,8 +1,4 @@
 <h1>Algoritmos de Grafos</h1>
-<div>
-  <img align="right" width="100px" src="./logo-ic.png" />
-  <img align="right" width="100px" src="./logo-ufal.png" />
-</div>
 
 <img align="center" src="./d&g.png" /><br>
 
