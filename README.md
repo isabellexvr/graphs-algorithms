@@ -1,9 +1,10 @@
 <h1>Algoritmos de Grafos</h1>
 <div>
   <img align="right" width="100px" src="./logo-ic.png" />
-  <img align="right" width="75vw" src="./d&g.png" /><br>
   <img align="right" width="100px" src="./logo-ufal.png" />
 </div>
+
+<img align="right" width="75vw" src="./d&g.png" /><br>
 
 <h3>Dupla</h3>
 <p>Isabelle Xavier e Marcos Melo</p>
