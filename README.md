@@ -8,6 +8,7 @@
 <h3>Dupla</h3>
 <p>Isabelle Xavier e Marcos Melo</p>
 
+<br>
 <h3>Professor</h3>
 <p>Rian Gabriel Pinheiro</p>
 
