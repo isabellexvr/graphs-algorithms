@@ -26,8 +26,7 @@
 
 <h3>Estrutura do Repositório</h3>
 <pre>
-.
-├── src                 # Código fonte em C++
+ .
    ├── prim             # Pasta da implementação do algoritmo de Prim
         ├── prim.cpp
         ├── prim.bin
