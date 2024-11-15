@@ -93,7 +93,7 @@ void readInputFile(const string &inputFileName, const string &outputFileName, in
     }
 
     int origem = initial;
-    djikstra(adj, origem, dist); // oi, voltei
+    djikstra(adj, origem, dist);
 
     for (int i = 1; i <= n; ++i) {
         if (dist[i] == std::numeric_limits<double>::max()) {
@@ -146,53 +146,7 @@ int main(int argc, char const *argv[])
     }else{ 
         readInputFile(inputFileName, outputFileName, initialVertex);
     }
-/* 
-    ifstream arquivo(inputFileName);
 
-    if (!arquivo) {
-        std::cerr << "Erro ao abrir o arquivo." << std::endl;
-        return 1;
-    }
-
-    int n, m;
-    arquivo >> n >> m;
-    arquivo.ignore(numeric_limits<streamsize>::max(), '\n');  // Ignora o resto da linha
-
-    Grafo adj(n);
-    
-    vector<double> dist(n+1, std::numeric_limits<double>::max());
-    
-    string line;
-    while (getline(arquivo, line)) {
-        //LINHA DO ARQUIVO
-        stringstream ss(line);
-        int u, v, peso = 1; // u, v e w
-
-        ss >> u >> v;  // Lê os dois primeiros valores (u e v)
-
-        if (ss >> peso) {
-            // Caso exista um terceiro valor, ele é usado como peso
-        }
-
-        adj.add_edge(u, v, peso);
-    }
-
-    //VÉRTICE INICIAL
-    int origem = initialVertex;
-    djikstra(adj, origem, dist); */
-
-    //std::cout << "Distâncias a partir do vértice " << origem << ":" << std::endl;
-/*     for (int i = 1; i <= n; ++i) {
-        if (dist[i] == std::numeric_limits<double>::max()) {
-            std::cout << i << ":"<< -1 << " ";
-        } else {
-            std::cout << i << ":" << dist[i] << " ";
-        }
-    }
-
-    cout << std::endl;
-
-    arquivo.close(); */
 
     return 0;
 }

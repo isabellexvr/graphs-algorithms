@@ -135,29 +135,24 @@ int kosajaru(Graph &graph, const std::string &filename)
         }
     }
 
-    // Reverse the graph
     Graph reversedGraph = graph.reverseGraph();
 
-    // Reset the visited vector for the second DFS
+
     visited = reversedGraph.createVisitedVector();
     int components = 0;
 
-    // Process vertices in order from the stack
     while (!firstDFSVisits.empty())
     {
         int v = firstDFSVisits.top();
         firstDFSVisits.pop();
 
-        // If the vertex is not visited in the reversed graph, process the SCC
         if (!visited[v])
         {
-            vector<int> scc;                                   // Store vertices of the strongly connected component
-            reversedGraph.dfsOnReversedGraph(v, visited, scc); // Second DFS on the reversed graph
+            vector<int> scc;                                   
+            reversedGraph.dfsOnReversedGraph(v, visited, scc); 
 
-            // Sort the component to ensure correct output order
-            sort(scc.begin(), scc.end());
+            //sort(scc.begin(), scc.end());
 
-            // Write the strongly connected component to the file
             for (int vertex : scc)
             {
                 cout << vertex << " ";
@@ -170,8 +165,8 @@ int kosajaru(Graph &graph, const std::string &filename)
         }
     }
 
-    outFile.close(); // Close the file after writing
-    return components; // Return the number of strongly connected components
+    outFile.close(); 
+    return components; 
 }
 
 void help(){

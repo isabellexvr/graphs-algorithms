@@ -55,5 +55,5 @@
 <pre><code>make</code></pre>
 
 <h3>Execução</h3>
-<p>Após a compilação, os arquivos executáveis gerados estarão na pasta <code>bin</code>. Para executar um dos algoritmos, utilize:</p>
-<pre><code>./bin/nome_do_algoritmo</code></pre>
+<p>Após a compilação, os arquivos executáveis gerados estarão na pasta <code>"nome_do_algoritmo"</code>. Para executar um dos algoritmos, utilize:</p>
+<pre><code>./nome_do_algoritmo.bin</code></pre>
